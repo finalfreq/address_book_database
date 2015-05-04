@@ -1,74 +1,34 @@
 class Contact
 
-  @@contacts = []
-  @@c_index = 0
-
-  attr_reader(:first, :last, :addresses, :phones, :emails, :c_id)
+  attr_reader(:first_name, :last_name, :id)
 
   define_method(:initialize) do |attributes|
-    @first = attributes.fetch(:first)
-    @last = attributes.fetch(:last)
-    @addresses =[]
-    @phones = []
-    @emails = []
-    @@c_index = @@c_index += 1
-    @c_id = @@c_index
+    @first = attributes.fetch(:first_name)
+    @last = attributes.fetch(:last_name)
+    @id = attributes.fetch(:id)
   end
 
   define_singleton_method(:all) do
-    @@contacts
+    returned_contacts = DB.exec("SELECT * FROM contacts;")
+    contacts = []
+    returned_contacts.each() do |contact|
+      first = contact.fetch("first_name")
+      last = contact.fetch("last_name")
+      id = contact.fetch("id")
+      contacts.push(Contact.new(first_name: first, last_name: last, id: id))
+    end
+  contacts
   end
 
   define_method(:save) do
-    @@contacts.push(self)
+    result = DB.exec("INSERT INTO contacts (first_name, last_name) VALUES ('#{@first_name}', '#{@last_name}') RETURNING id;" )
+    @id = result.first().fetch("id").to_i()
   end
 
-  define_method(:add_phone) do |phone|
-    @phones.push(phone)
+  define_method(:==) do |another_contact|
+    self.first_name().==(another_contact.first_name()).&(self.last_name().==(another_contact.last_name()))
   end
 
-  define_method(:add_address) do |address|
-    @addresses.push(address)
-  end
-
-  define_method(:add_email) do |email|
-    @emails.push(email)
-  end
-
-  define_singleton_method(:clear) do
-    @@contacts = []
-    @@c_index = 0
-  end
-
-  define_singleton_method(:find) do |id|
-    found_contact = nil
-    @@contacts.each() do |contact|
-      if contact.c_id() == id.to_i
-        found_contact = contact
-      end
-    end
-    found_contact
-  end
-
-  define_singleton_method(:delete) do |contact|
-    to_delete = contact.c_id()
-    @@contacts.delete_if {|contact| contact.c_id().eql?(to_delete)}
-  end
-
-  define_singleton_method(:del_add) do |address|
-    target_address = address
-    @addresses.delete_if{|inside_address| inside_address.eql?(target_address)}
-  end
-
-  define_singleton_method(:del_ph) do |phone|
-    target_phone = phone
-    @phone.delete_if{|inside_phone| inside_phone.eql?(target_phone)}
-  end
-
-  define_singleton_method(:del_em) do |email|
-    target_email = email
-    @emails.delete_if{|inside_email| inside_email.eql?(target_email)}
-  end
 
 
 end

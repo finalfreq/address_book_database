@@ -1,27 +1,34 @@
-require("rspec")
-require('pry')
-require('contact')
-require('phone')
-require('address')
-require('email')
+require('spec_helper')
 
 
 describe(Contact) do
-  # before() do
-  #   Phone.clear()
-  # end
+  describe('#save') do
+    it('saves the contact to the array of saved contacts') do
+      contact1 = Contact.new(first_name: 'james', last_name: 'williams', id: nil)
+      contact1.save()
+      expect(Contact.all()).to(eq([contact1]))
+    end
+  end
 
-  describe('#contact') do
-    it('returns the contact') do
-      test_contact = Contact.new({:first => "bob", :last =>"deck"})
-      phone = Phone.new({:area => 123, :number => 1234567, :type => "cell"})
-      address = Address.new({:street_address => "123 hell", :city => "potlandia", :state => "mother russia", :zip => 12345})
-      email = Email.new({:email => "be@be.com"})
-      test_contact.add_phone(phone)
-      test_contact.add_address(address)
-      test_contact.add_email(email)
-      expect(test_contact.emails()[0].email()).to(eq("be@be.com"))
-      expect(test_contact.phones()[0].area()).to(eq(123))
+  describe('.all') do
+    it('Is empty at first')  do
+      expect(Contact.all()).to(eq([]))
+    end
+  end
+
+  describe('#==') do
+    it("is the same contact if it has the same first & last name") do
+      contact1 = Contact.new(first_name: 'james', last_name: 'williams', id: nil)
+      contact2 = Contact.new(first_name: 'james', last_name: 'williams', id: nil)
+      expect(contact1).to(eq(contact2))
+    end
+  end
+
+  describe('#id') do
+    it("sets the ID when you save it") do
+      contact1 = Contact.new(first_name: 'james', last_name: 'williams', id: nil)
+      contact1.save()
+      expect(contact1.id()).to(be_an_instance_of(Fixnum))
     end
   end
 end
